@@ -1,0 +1,122 @@
+﻿@page "/order"
+@inject IProductServices services
+<h3>CreateShoppingList</h3>
+
+@if (cart == null)
+{
+<p>Loading...</p>
+}
+
+else { 
+
+<EditForm Model="@product" OnValidSubmit="AddProduct">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label class="ml-1">Product<InputText class="ml-1" id="prodName" @bind-Value="product.Name" /></label>
+
+    <label class="ml-1">Quantity<InputNumber class="ml-1" id="q" @bind-Value="product.Quantity" /></label>
+
+    <label class="ml-1">
+        Department
+        <InputSelect @bind-Value="product.Department">
+            @foreach (var department in Enum.GetValues(typeof(StoreDepartments)))
+            {
+                <option value="@department">@department</option>
+            }
+        </InputSelect>
+    </label>
+    <button type="submit" class="btn btn-sm btn-outline-success">Submit</button>
+</EditForm>
+
+
+<table class="table col-md-6">
+    <thead>
+        <tr>
+            <td class="ml-1">Product</td>
+            <td class="ml-1 text-center">Quantity</td>
+            <td class="ml-1">Department</td>
+            <td class="ml-1">Done</td>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in cart)
+        {
+            @if (item.Current && !item.IsDone)
+            {
+                <tr>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td class="text-center">
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.Department
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" @onclick="async ()=>await Done(item)">done</button>
+                    </td>
+                </tr>
+            }
+        }
+
+        @foreach (var item in cart)
+        {
+            @if (item.Current && item.IsDone)
+            {
+                <tr class="text-muted">
+                    <td>
+                        @item.Name
+                    </td>
+                    <td class="text-center">
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.Department
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" @onclick="async ()=>await Done(item)">
+                            back
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+}
+
+@code {
+    public List<ProductModel> cart { get; set; }
+    private ProductModel product = new ProductModel();
+
+
+
+
+    private async Task AddProduct()
+    {       
+        
+        await services.AddNewProduct(product);
+        
+        cart.Add(product);
+        cart = cart.OrderBy(o => o.Name).ToList();
+        product = new ProductModel();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        cart = await services.GetAllProducts();
+    }
+
+
+
+    async Task Done(ProductModel model)
+    {
+
+        model.IsDone = !model.IsDone;
+        await services.UpdateProduct(model);
+    }
+
+
+}
