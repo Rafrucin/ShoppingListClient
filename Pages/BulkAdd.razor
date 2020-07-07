@@ -1,0 +1,18 @@
+﻿@page "/bulk"
+<h3>BulkAdd</h3>
+
+<EditForm Model="@stringCatch">
+    <p>Products coma separated</p>
+    <InputTextArea @bind-Value="stringCatch.BulkString"/>
+</EditForm>
+
+@code {
+
+    
+    StringCatch stringCatch = new StringCatch();
+
+
+
+
+
+}

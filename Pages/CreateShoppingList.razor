@@ -1,6 +1,7 @@
 ﻿@page "/order"
 @inject IProductServices services
-<h3>CreateShoppingList</h3>
+@inject IHelpers helper
+<h3>Create Shopping List</h3>
 
 @if (cart == null)
 {
@@ -25,17 +26,24 @@ else {
             }
         </InputSelect>
     </label>
-    <button type="submit" class="btn btn-sm btn-outline-success">Submit</button>
+    <button type="submit" class="btn btn-block btn-success">
+    @if (selectedProduct.Name == null)
+    {
+            @submitString 
+    }
+    else { @updateString 
+    }</button>
 </EditForm>
 
 
-<table class="table col-md-6">
+<table class="table">
     <thead>
         <tr>
             <td class="ml-1">Product</td>
             <td class="ml-1 text-center">Quantity</td>
             <td class="ml-1">Department</td>
-            <td class="ml-1">Done</td>
+            <td class="ml-1">Select</td>
+            <td class="ml-1">Remove</td>
         </tr>
     </thead>
     <tbody>
@@ -44,45 +52,25 @@ else {
         {
             @if (item.Current && !item.IsDone)
             {
-                <tr>
-                    <td>
-                        @item.Name
-                    </td>
-                    <td class="text-center">
-                        @item.Quantity
-                    </td>
-                    <td>
-                        @item.Department
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-success" @onclick="async ()=>await Done(item)">done</button>
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    @item.Name
+                </td>
+                <td class="text-center">
+                    @item.Quantity
+                </td>
+                <td>
+                    @item.Department
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" @onclick="()=> SelectProduct(item)">Update</button>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-danger" @onclick="async ()=>await RemoveFromList(item)">Remove</button>
+                </td>
+            </tr>
             }
-        }
-
-        @foreach (var item in cart)
-        {
-            @if (item.Current && item.IsDone)
-            {
-                <tr class="text-muted">
-                    <td>
-                        @item.Name
-                    </td>
-                    <td class="text-center">
-                        @item.Quantity
-                    </td>
-                    <td>
-                        @item.Department
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-success" @onclick="async ()=>await Done(item)">
-                            back
-                        </button>
-                    </td>
-                </tr>
-            }
-        }
+        }      
     </tbody>
 </table>
 }
@@ -90,33 +78,60 @@ else {
 @code {
     public List<ProductModel> cart { get; set; }
     private ProductModel product = new ProductModel();
-
-
-
-
-    private async Task AddProduct()
-    {       
-        
-        await services.AddNewProduct(product);
-        
-        cart.Add(product);
-        cart = cart.OrderBy(o => o.Name).ToList();
-        product = new ProductModel();
-    }
-
     protected async override Task OnInitializedAsync()
     {
         cart = await services.GetAllProducts();
+        SortList();
     }
 
+    ProductModel selectedProduct = new ProductModel();
+    string submitString = "Submit";
+    string updateString = "";
 
-
-    async Task Done(ProductModel model)
+    async Task RemoveFromList(ProductModel model)
     {
-
-        model.IsDone = !model.IsDone;
+        model.Current = false;
         await services.UpdateProduct(model);
     }
 
+    private void SelectProduct( ProductModel item)
+    {
+        if (item==selectedProduct)
+        {
+            product = new ProductModel();
+            selectedProduct = new ProductModel();
+        }
+        else
+        {
+            selectedProduct = item;
+            product.Name = selectedProduct.Name;
+            product.Quantity = selectedProduct.Quantity;
+            product.Department = selectedProduct.Department;
+            updateString = $"Update {item.Name}";
+        }
+    }
+
+    private void SortList()
+    {
+        cart = cart.OrderBy(o => o.Name).ToList();
+    }
+
+    private async Task AddProduct()
+    {
+
+        await helper.AddProductAsync(product, cart, selectedProduct);
+        cart = await services.GetAllProducts();
+        SortList();
+        product = new ProductModel();
+        selectedProduct = new ProductModel();
+    }
+
+
+    //todo select/update item
+    // todo bulkAdd
+    // todo to in shop view
+    // todo sort by dept
+    // todo auth
+    // todo many users
 
 }

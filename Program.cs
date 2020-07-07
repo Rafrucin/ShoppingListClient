@@ -24,6 +24,8 @@ namespace ShoppingListClient
             builder.Services.AddHttpClient();
 
             builder.Services.AddTransient<IProductServices, ProductServices>();
+
+            builder.Services.AddTransient<IHelpers, Helpers>();
         
             await builder.Build().RunAsync();
         }

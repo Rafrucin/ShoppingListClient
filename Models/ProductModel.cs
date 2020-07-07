@@ -15,11 +15,11 @@ namespace ShoppingListClient.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
-        public StoreDepartments Department { get; set; }
+        public StoreDepartments Department { get; set; } = (StoreDepartments)1;
 
-        
-        [Required]                
-        public int Quantity { get; set; }
+
+        [Required]
+        public int Quantity { get; set; } = 1;
 
         public bool Current { get; set; } = true;
 

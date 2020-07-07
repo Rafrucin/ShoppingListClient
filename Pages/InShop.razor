@@ -1,0 +1,107 @@
+﻿@page "/inShop"
+@inject IProductServices services
+@inject IHelpers helper
+<h3>Shop</h3>
+
+@if (cart == null)
+{
+    <p>Loading...</p>
+}
+
+else
+{
+<table class="table">
+    <thead>
+        <tr class="bg-light">
+            <td class="ml-1">Product</td>
+            <td class="ml-1 text-center">Quantity</td>
+            <td class="ml-1">Department</td>
+            <td class="ml-1">Done</td>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in cart)
+        {
+            @if (item.Current && !item.IsDone)
+            {
+                <tr>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td class="text-center">
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.Department
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="async ()=>await Done(item)">done</button>
+                    </td>
+                </tr>
+            }
+        }
+
+        @foreach (var item in cart)
+        {
+            @if (item.Current && item.IsDone)
+            {
+                <tr class="text-muted bg-light">
+                    <td>
+                        <s>@item.Name</s>
+                    </td>
+                    <td class="text-center">
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.Department
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-dark" @onclick="async ()=>await Done(item)">
+                            back
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div>
+    <button class="btn btn-block btn-danger" @onclick="async()=> await Finalise()">Finalise</button>
+</div>
+}
+
+@code {
+    public List<ProductModel> cart { get; set; }
+    private ProductModel product = new ProductModel();
+
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        cart = await services.GetAllProducts();
+        SortList();
+    }
+
+    
+    private void SortList()
+    {
+        cart = cart.OrderBy(o => o.Name).ToList();
+    }
+
+    async Task Finalise()
+    {
+        await helper.Finalise(cart);
+    }
+
+    async Task Done(ProductModel model)
+    {
+
+        model.IsDone = !model.IsDone;
+        await services.UpdateProduct(model);
+        SortList();
+        product = new ProductModel();
+    }
+
+}
