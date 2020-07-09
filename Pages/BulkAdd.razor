@@ -1,18 +1,56 @@
-﻿@page "/bulk"
-<h3>BulkAdd</h3>
+﻿@page "/bulkadd"
+@inject NavigationManager _nav
+@inject IHelpers helper
+@inject IProductServices services
 
-<EditForm Model="@stringCatch">
-    <p>Products coma separated</p>
-    <InputTextArea @bind-Value="stringCatch.BulkString"/>
-</EditForm>
+<h3>Bulk Add</h3>
+
+<div>
+    <EditForm Model="stringCatch" OnValidSubmit="ProcessBulk">
+        <p>Please separate your products with commas</p>
+        <InputTextArea class="col" rows="5"
+                       placeholder="Comma Separated Products" @bind-Value="productText" />
+        <button type="submit" disabled="@IsBusy" class="btn btn-block btn-danger" >Submit</button>
+    </EditForm>
+</div>
+
+
 
 @code {
 
-    
+    string productText;
     StringCatch stringCatch = new StringCatch();
+    List<ProductModel> productsToAdd = new List<ProductModel>();
+    List<ProductModel> AllProducts;
+
+    bool IsBusy = true;
+
+    protected async override Task OnInitializedAsync()
+    {
+        AllProducts = await services.GetAllProducts();
+        IsBusy = false;
+    }
 
 
 
-
-
+    async Task ProcessBulk()
+    {
+        IsBusy = true;
+        // initialize getallproduct and send something ready.
+        string[] products = productText.Split(',');
+        List<ProductModel> productsToAdd = new List<ProductModel>();
+        foreach (string p in products)
+        {
+            ProductModel model = new ProductModel();
+            var pt= p.Trim();
+            if (pt.Length>2)
+            {
+                model.Name = pt;
+                model.Department = StoreDepartments.other;
+                productsToAdd.Add(model);
+            }
+        }
+        await helper.BulkAdd(AllProducts, productsToAdd);
+        _nav.NavigateTo("/order");
+    }
 }

@@ -7,6 +7,6 @@ namespace ShoppingListClient.Models
 {
     public class StringCatch
     {
-        public string BulkString { get; set; }
+        public string[] BulkString { get; set; }
     }
 }

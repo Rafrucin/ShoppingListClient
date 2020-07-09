@@ -27,8 +27,7 @@ namespace ShoppingListClient.Services
         }
 
         public async Task<ProductModel> AddNewProduct(ProductModel model)
-        {
-            
+        {            
             var response = await _httpClient.PostAsJsonAsync(_baseURL, model);
             return await response.Content.ReadFromJsonAsync<ProductModel>();
         }

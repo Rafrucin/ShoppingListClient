@@ -31,9 +31,37 @@ namespace ShoppingListClient.Services
             }
         }
 
+        public async Task BulkAdd(List<ProductModel> products, List<ProductModel> ProductsToAdd)
+        {
+            foreach (var product in ProductsToAdd)
+            {
+                if (products.Where(p => p.Name == product.Name).Count() > 0)
+                {
+                    ProductModel p = products.Where(p => p.Name == product.Name).First();
+                    if (p.Current == false)
+                    {
+                        
+                        p.IsDone = false;
+                        p.Current = true;
+                        p.Quantity += product.Quantity;
+                        await _services.UpdateProduct(p);
+                    }
+                    else
+                    {
+                        p.Quantity += product.Quantity;
+                        await _services.UpdateProduct(p);
+                    }
+                }
+                else
+                {
+                    await _services.AddNewProduct(product);
+                }
+            }
+        }
+
         public async Task AddProductAsync(ProductModel model, List<ProductModel> products, ProductModel selected)
         {
-            if (model.Quantity<1)
+            if (model.Quantity < 1)
             {
                 model.Quantity = 1;
             }
@@ -51,7 +79,8 @@ namespace ShoppingListClient.Services
             {
                 ProductModel p = products.Where(p => p.Name == model.Name).First();
                 if (p.Current == false)
-                {                
+                {
+                    p.Department = model.Department;
                     p.IsDone = false;
                     p.Current = true;
                     p.Quantity += model.Quantity;
@@ -60,6 +89,7 @@ namespace ShoppingListClient.Services
                else
                 {
                     p.Quantity += model.Quantity;
+                    p.Department = model.Department;
                     await _services.UpdateProduct(p);
                 }
 
