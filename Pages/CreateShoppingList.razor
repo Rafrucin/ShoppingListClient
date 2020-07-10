@@ -11,14 +11,14 @@
 else
 {
 
-<EditForm Model="@product" OnValidSubmit="AddProduct">
+<EditForm Model="@product" OnValidSubmit="AddProduct" class="form-group">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <label class="ml-1">Product<InputText class="ml-1" id="prodName" @bind-Value="product.Name" /></label>
+    <label class="col-form-label col-form-label-sm">Product<InputText class="ml-1" id="prodName" @bind-Value="product.Name" /></label>
 
-    <label class="ml-1">Quantity<InputNumber class="ml-1" id="q" @bind-Value="product.Quantity" /></label>
+    <label class="col-form-label col-form-label-sm">Quantity<InputNumber class="ml-1" id="q" @bind-Value="product.Quantity" /></label>
 
-    <label class="ml-1">
+    <label class="col-form-label col-form-label-sm">
         Department
         <InputSelect @bind-Value="product.Department">
             @foreach (var department in Enum.GetValues(typeof(StoreDepartments)))
@@ -54,7 +54,7 @@ else
     </EditForm>
 
 
-    <table class="table table-sm">
+    <table class="table table-sm pt-1">
         <thead>
             <tr class="bg-light">
                 <td class="ml-1"><strong>Product</strong></td>
@@ -68,7 +68,7 @@ else
                 @if (item.Current && !item.IsDone)
                 {
                     @if (item == selectedProduct) { selectRow = "table-info"; } else { selectRow = ""; }
-                    <tr @onclick="()=> SelectProduct(item)" class="@selectRow">
+                    <tr @onclick="()=> SelectProduct(item)" style="cursor: pointer" class="@selectRow">
                         <td>
                             @item.Name
                         </td>
@@ -93,7 +93,6 @@ else
         cart = await services.GetAllProducts();
         SortList();
     }
-
     ProductModel selectedProduct = new ProductModel();
     string submitString = "Submit";
     string updateString = "";
@@ -133,7 +132,8 @@ else
 
     private async Task AddProduct()
     {
-
+        //TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+        //product.Name = ti.ToTitleCase(product.Name);
         await helper.AddProductAsync(product, cart, selectedProduct);
         cart = await services.GetAllProducts();
         SortList();

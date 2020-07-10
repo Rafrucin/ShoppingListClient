@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http.Json;
 using System.Net.Http;
 using ShoppingListClient.Models;
+using System.Globalization;
 
 namespace ShoppingListClient.Services
 {
@@ -27,15 +28,14 @@ namespace ShoppingListClient.Services
         }
 
         public async Task<ProductModel> AddNewProduct(ProductModel model)
-        {            
+        {
             var response = await _httpClient.PostAsJsonAsync(_baseURL, model);
             return await response.Content.ReadFromJsonAsync<ProductModel>();
         }
 
         public async Task UpdateProduct(ProductModel model)
         {
-            var response = await _httpClient.PutAsJsonAsync<ProductModel>($"{_baseURL}/{model.Id}", model);
-            
+            var response = await _httpClient.PutAsJsonAsync<ProductModel>($"{_baseURL}/{model.Id}", model);            
         }
 
 

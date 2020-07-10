@@ -11,9 +11,7 @@ namespace ShoppingListClient.Models
 
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string Name { get; set; }
+        
 
         public StoreDepartments Department { get; set; } = (StoreDepartments)1;
 
@@ -25,7 +23,48 @@ namespace ShoppingListClient.Models
 
         public bool IsDone { get; set; } = false;
 
+        [Required]
+        [MaxLength(100)]
+        private string _name { get; set; }
+
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+
+            set
+            {
+                _name = ToUpperFirstCase(value);             
+            }
+        }
+
+        private string ToUpperFirstCase(string input)
+        {
+            char firstLetter = input[0];
+            firstLetter = Char.ToUpper(firstLetter);
+            return firstLetter + input.Substring(1);
+        }
 
     }
 
 }
+
+//private int _age;
+
+//public int Age
+//{
+//    get
+//    {
+//        return _age;
+//    }
+
+//    set
+//    {
+//        if (value > 0) // Check for the valid age
+//        {
+//            _age = value;
+//        }
+//    }
+//}

@@ -35,6 +35,10 @@
 
     async Task ProcessBulk()
     {
+        if (productText==null)
+        {
+            return;
+        }
         IsBusy = true;
         // initialize getallproduct and send something ready.
         string[] products = productText.Split(',');

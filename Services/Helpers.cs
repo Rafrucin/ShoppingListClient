@@ -1,6 +1,7 @@
 ﻿using ShoppingListClient.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -61,6 +62,7 @@ namespace ShoppingListClient.Services
 
         public async Task AddProductAsync(ProductModel model, List<ProductModel> products, ProductModel selected)
         {
+            
             if (model.Quantity < 1)
             {
                 model.Quantity = 1;
